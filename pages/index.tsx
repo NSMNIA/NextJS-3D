@@ -16,7 +16,14 @@ const Home: NextPage = () => {
     var savedLatitude: number;
 
     // panoramas background
-    var panoramasArray = ["/images/01.jpg", "/images/02.jpg", "/images/03.jpg", "/images/04.jpg", "/images/05.jpg", "/images/06.jpg"];
+    var panoramasArray = [
+      ["/images/01.jpg", [["points", "to"], ["points", "to"]]],
+      ["/images/02.jpg", [["points", "to"], ["points", "to"]]],
+      ["/images/03.jpg", [["points", "to"], ["points", "to"]]],
+      ["/images/04.jpg", [["points", "to"], ["points", "to"]]],
+      ["/images/05.jpg", [["points", "to"], ["points", "to"]]],
+      ["/images/06.jpg", [["points", "to"], ["points", "to"]]]
+    ];
     var panoramaNumber = 0;
 
     let renderer = new THREE.WebGLRenderer();
@@ -37,12 +44,13 @@ const Home: NextPage = () => {
 
     // creation of the sphere material
     var sphereMaterial = new THREE.MeshBasicMaterial();
-    sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber])
+    sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber][0])
 
     // geometry + material = mesh (actual object)
     var sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
     scene.add(sphereMesh);
 
+    let drag = false;
     // listeners
     document.addEventListener("mousedown", onDocumentMouseDown, false);
     document.addEventListener("mousemove", onDocumentMouseMove, false);
@@ -62,7 +70,6 @@ const Home: NextPage = () => {
 
       // calling again render function
       renderer.render(scene, camera);
-
     }
 
     // when the mouse is pressed, we switch to manual control and save current coordinates
@@ -74,11 +81,13 @@ const Home: NextPage = () => {
       savedY = event.clientY;
       savedLongitude = longitude;
       savedLatitude = latitude;
+      drag = false
     }
 
     // when the mouse moves, if in manual contro we adjust coordinates
     function onDocumentMouseMove(event: MouseEvent) {
       if (manualControl) {
+        drag = true
         longitude = (savedX - event.clientX) * 0.1 + savedLongitude;
         latitude = (event.clientY - savedY) * 0.1 + savedLatitude;
       }
@@ -88,6 +97,8 @@ const Home: NextPage = () => {
     function onDocumentMouseUp(event: MouseEvent) {
       document.body.style.cursor = '';
       manualControl = false;
+      console.log(drag ? 'drag' : 'click');
+      drag = false;
     }
 
     // pressing a key (actually releasing it) changes the texture map
@@ -103,7 +114,7 @@ const Home: NextPage = () => {
       function rightHandler(){
         panoramaNumber = (panoramaNumber + 1) % panoramasArray.length
       }
-      sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber])
+      sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber][0])
     }
   }, []);
   return (
