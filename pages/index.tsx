@@ -27,10 +27,10 @@ const Home: NextPage = () => {
     var panoramaNumber = 0;
 
     let renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     if (document.querySelector('main')?.children) document.querySelector('main')!.innerHTML = '';
     document.querySelector('main')?.append(renderer.domElement);
-
 
     var scene = new THREE.Scene();
 
@@ -50,12 +50,13 @@ const Home: NextPage = () => {
     var sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
     scene.add(sphereMesh);
 
-    let drag = false;
     // listeners
     document.addEventListener("mousedown", onDocumentMouseDown, false);
     document.addEventListener("mousemove", onDocumentMouseMove, false);
     document.addEventListener("mouseup", onDocumentMouseUp, false);
 
+    // click variables
+    const mouse = new THREE.Vector3();
     render();
 
     function render() {
@@ -72,6 +73,7 @@ const Home: NextPage = () => {
       renderer.render(scene, camera);
     }
 
+    let drag = false;
     // when the mouse is pressed, we switch to manual control and save current coordinates
     function onDocumentMouseDown(event: MouseEvent) {
       event.preventDefault();
@@ -92,15 +94,37 @@ const Home: NextPage = () => {
         latitude = (event.clientY - savedY) * 0.1 + savedLatitude;
       }
     }
-
+    let raycaster = new THREE.Raycaster();
+    let spriteMaterial = new THREE.SpriteMaterial({
+        map: new THREE.TextureLoader().load(
+        "https://cywarr.github.io/small-shop/Marker.png"
+        )
+      });
+    let markers = [],
+    intersects = [],
+    markersCounter = 0;
     // when the mouse is released, we turn manual control off
-    function onDocumentMouseUp(event: MouseEvent) {
+    function onDocumentMouseUp(e: MouseEvent) {
       document.body.style.cursor = '';
       manualControl = false;
+      if(!drag){
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = (e.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+
+        let marker = new THREE.Sprite(spriteMaterial);
+        marker.scale.set(20, 20, 1);
+        marker.name = "marker" + markersCounter;
+        raycaster.ray.at(210, marker.position);
+
+        scene.add(marker);
+        markers.push(marker);
+        markersCounter++;
+        console.log(scene);
+      }
       console.log(drag ? 'drag' : 'click');
       drag = false;
     }
-
     // pressing a key (actually releasing it) changes the texture map
     document.onkeyup = function (event: KeyboardEvent) {
       const callback = {
