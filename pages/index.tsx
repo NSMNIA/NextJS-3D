@@ -1,9 +1,7 @@
 import type { NextPage } from 'next'
-import { useEffect } from 'react'
 import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-import * as THREE from 'three';
+import { useEffect } from 'react'
+import * as THREE from 'three'
 
 const Home: NextPage = () => {
   useEffect(() => {
@@ -17,12 +15,12 @@ const Home: NextPage = () => {
 
     // panoramas background
     var panoramasArray = [
-      ["/images/01.jpg", [["points", "to"], ["points", "to"]]],
-      ["/images/02.jpg", [["points", "to"], ["points", "to"]]],
-      ["/images/03.jpg", [["points", "to"], ["points", "to"]]],
-      ["/images/04.jpg", [["points", "to"], ["points", "to"]]],
-      ["/images/05.jpg", [["points", "to"], ["points", "to"]]],
-      ["/images/06.jpg", [["points", "to"], ["points", "to"]]]
+      ["https://nsmnia.github.io/NextJS-3D/images/01.jpg", [["points", "to"], ["points", "to"]]],
+      ["https://nsmnia.github.io/NextJS-3D/images/02.jpg", [["points", "to"], ["points", "to"]]],
+      ["https://nsmnia.github.io/NextJS-3D/images/03.jpg", [["points", "to"], ["points", "to"]]],
+      ["https://nsmnia.github.io/NextJS-3D/images/04.jpg", [["points", "to"], ["points", "to"]]],
+      ["https://nsmnia.github.io/NextJS-3D/images/05.jpg", [["points", "to"], ["points", "to"]]],
+      ["https://nsmnia.github.io/NextJS-3D/images/06.jpg", [["points", "to"], ["points", "to"]]]
     ];
     var panoramaNumber = 0;
 
@@ -44,7 +42,7 @@ const Home: NextPage = () => {
 
     // creation of the sphere material
     var sphereMaterial = new THREE.MeshBasicMaterial();
-    sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber][0])
+    sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber][0] as string);
 
     // geometry + material = mesh (actual object)
     var sphereMesh = new THREE.Mesh(sphere, sphereMaterial);
@@ -64,9 +62,9 @@ const Home: NextPage = () => {
       // limiting latitude from -85 to 85 (cannot point to the sky or under your feet)
       latitude = Math.max(-85, Math.min(85, latitude));
       // moving the camera according to current latitude (vertical movement) and longitude (horizontal movement)
-      camera.target.x = 500 * Math.sin(THREE.Math.degToRad(90 - latitude)) * Math.cos(THREE.Math.degToRad(longitude));
-      camera.target.y = 500 * Math.cos(THREE.Math.degToRad(90 - latitude));
-      camera.target.z = 500 * Math.sin(THREE.Math.degToRad(90 - latitude)) * Math.sin(THREE.Math.degToRad(longitude));
+      camera.target.x = 500 * Math.sin(THREE.MathUtils.degToRad(90 - latitude)) * Math.cos(THREE.MathUtils.degToRad(longitude));
+      camera.target.y = 500 * Math.cos(THREE.MathUtils.degToRad(90 - latitude));
+      camera.target.z = 500 * Math.sin(THREE.MathUtils.degToRad(90 - latitude)) * Math.sin(THREE.MathUtils.degToRad(longitude));
       camera.lookAt(camera.target);
 
       // calling again render function
@@ -96,18 +94,18 @@ const Home: NextPage = () => {
     }
     let raycaster = new THREE.Raycaster();
     let spriteMaterial = new THREE.SpriteMaterial({
-        map: new THREE.TextureLoader().load(
+      map: new THREE.TextureLoader().load(
         "https://cywarr.github.io/small-shop/Marker.png"
-        )
-      });
+      )
+    });
     let markers = [],
-    intersects = [],
-    markersCounter = 0;
+      intersects = [],
+      markersCounter = 0;
     // when the mouse is released, we turn manual control off
     function onDocumentMouseUp(e: MouseEvent) {
       document.body.style.cursor = '';
       manualControl = false;
-      if(!drag){
+      if (!drag) {
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
         mouse.y = (e.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
@@ -128,17 +126,17 @@ const Home: NextPage = () => {
     // pressing a key (actually releasing it) changes the texture map
     document.onkeyup = function (event: KeyboardEvent) {
       const callback = {
-          "ArrowLeft"  : leftHandler,
-          "ArrowRight" : rightHandler,
+        "ArrowLeft": leftHandler,
+        "ArrowRight": rightHandler,
       }[event.key]
       callback?.()
-      function leftHandler(){
+      function leftHandler() {
         panoramaNumber = panoramaNumber != 0 ? (panoramaNumber - 1) : panoramasArray.length - 1;
       }
-      function rightHandler(){
+      function rightHandler() {
         panoramaNumber = (panoramaNumber + 1) % panoramasArray.length
       }
-      sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber][0])
+      sphereMaterial.map = THREE.ImageUtils.loadTexture(panoramasArray[panoramaNumber][0] as string)
     }
   }, []);
   return (

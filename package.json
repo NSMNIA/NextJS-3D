@@ -2,11 +2,14 @@
   "name": "nextjs-3d",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://nsmnia.github.io/NextJS-3D/",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next export && echo 'https://nsmnia.github.io/NextJS-3D' > ./out/.nojekyll",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d out -t true"
   },
   "dependencies": {
     "babylonjs": "^4.2.1",
@@ -21,6 +24,7 @@
     "@types/three": "^0.138.0",
     "eslint": "8.10.0",
     "eslint-config-next": "12.1.0",
+    "gh-pages": "^4.0.0",
     "typescript": "4.6.2"
   }
 }
